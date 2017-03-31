@@ -12,13 +12,13 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var display: UILabel!
     
-    var isFirstTime: Bool = true
+    var isInTheMiddleOfTyping: Bool = false
     
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
-        if isFirstTime {
+        if !isInTheMiddleOfTyping {
             display.text = digit
-            isFirstTime = false
+            isInTheMiddleOfTyping = true
         } else {
             let textCurrentlyInDisplay = display.text!
             display.text = textCurrentlyInDisplay + digit
@@ -34,17 +34,21 @@ class ViewController: UIViewController {
         }
     }
     
+    private var brain = CalculatorBrain()
+    
     @IBAction func performAction(_ sender: UIButton) {
-        isFirstTime = true
+        
+        if isInTheMiddleOfTyping {
+            brain.setOperand(displayValue)
+            isInTheMiddleOfTyping = false
+        }
+        
         if let mathematicalSymbol = sender.currentTitle {
-            switch mathematicalSymbol {
-            case "π":
-                displayValue = Double.pi
-            case "√":
-                displayValue = sqrt(displayValue)
-            default:
-                break
-            }
+            brain.performOperation(mathematicalSymbol)
+        }
+        
+        if let result = brain.result {
+            displayValue = result
         }
     }
 }
